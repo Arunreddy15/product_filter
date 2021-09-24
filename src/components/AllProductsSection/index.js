@@ -65,14 +65,21 @@ const ratingsList = [
   },
 ]
 
+const apiStatusConstants = {
+  initial: 'INITIAL',
+  success: 'SUCCESS',
+  failure: 'FAILURE',
+  inProgress: 'IN_PROGRESS',
+}
+
 class AllProductsSection extends Component {
   state = {
     productsList: [],
-    isLoading: false,
+    apiStatus: apiStatusConstants.initial,
     activeOptionId: sortbyOptions[0].optionId,
     searchValue: '',
-    categoryId: 0,
-    ratingId: 0,
+    activeCategoryId: '',
+    activeRatingId: '',
   }
 
   componentDidMount() {
@@ -80,34 +87,43 @@ class AllProductsSection extends Component {
   }
 
   searchInput = value => {
-    this.setState({searchValue: value}, this.getProducts)
+    this.setState({searchValue: value})
   }
 
-  categoryFilter = value => {
-    this.setState({categoryId: value}, this.getProducts)
+  onEnter = () => {
+    this.getProducts()
   }
 
-  ratingFilter = id => {
-    this.setState({ratingId: id}, this.getProducts)
+  categoryFilter = activeCategoryId => {
+    this.setState({activeCategoryId}, this.getProducts)
+  }
+
+  ratingFilter = activeRatingId => {
+    this.setState({activeRatingId}, this.getProducts)
   }
 
   clearFilters = () => {
     this.setState(
-      {categoryId: 0, ratingId: 0, searchValue: ''},
+      {activeCategoryId: '', activeRatingId: '', searchValue: ''},
       this.getProducts,
     )
   }
 
   getProducts = async () => {
     this.setState({
-      isLoading: true,
+      apiStatus: apiStatusConstants.inProgress,
     })
     const jwtToken = Cookies.get('jwt_token')
 
     // TODO: Update the code to get products with filters applied
 
-    const {activeOptionId, searchValue, categoryId, ratingId} = this.state
-    const apiUrl = `https://apis.ccbp.in/products?sort_by=${activeOptionId}&category=${categoryId}&title_search=${searchValue}&rating=${ratingId}`
+    const {
+      activeOptionId,
+      searchValue,
+      activeCategoryId,
+      activeRatingId,
+    } = this.state
+    const apiUrl = `https://apis.ccbp.in/products?sort_by=${activeOptionId}&category=${activeCategoryId}&title_search=${searchValue}&rating=${activeRatingId}`
     const options = {
       headers: {
         Authorization: `Bearer ${jwtToken}`,
@@ -115,8 +131,12 @@ class AllProductsSection extends Component {
       method: 'GET',
     }
     const response = await fetch(apiUrl, options)
-    if (response.ok) {
+    if (response.ok === true) {
       const fetchedData = await response.json()
+      console.log(fetchedData)
+      //   if (fetchedData.length === 0) {
+      //     this.renderNoProductsFound()
+      //   } else {
       const updatedData = fetchedData.products.map(product => ({
         title: product.title,
         brand: product.brand,
@@ -127,10 +147,13 @@ class AllProductsSection extends Component {
       }))
       this.setState({
         productsList: updatedData,
-        isLoading: false,
+        apiStatus: apiStatusConstants.success,
       })
+      //   }
     } else {
-      this.renderFailureProductList()
+      this.setState({
+        apiStatus: apiStatusConstants.failure,
+      })
     }
   }
 
@@ -163,11 +186,15 @@ class AllProductsSection extends Component {
   }
 
   renderNoProductsFound = () => (
-    <img
-      src="https://assets.ccbp.in/frontend/react-js/nxt-trendz/nxt-trendz-no-products-view.png"
-      alt="no products"
-      className="no-products"
-    />
+    <div className="not-found">
+      <img
+        src="https://assets.ccbp.in/frontend/react-js/nxt-trendz/nxt-trendz-no-products-view.png"
+        alt="no products"
+        className="no-products"
+      />
+      <h1>No Product Found</h1>
+      <p>We could not found any products, Try other filters</p>
+    </div>
   )
 
   renderLoader = () => (
@@ -179,15 +206,35 @@ class AllProductsSection extends Component {
   // TODO: Add failure view
 
   renderFailureProductList = () => (
-    <img
-      src="https://assets.ccbp.in/frontend/react-js/nxt-trendz/nxt-trendz-products-error-view.png"
-      alt="products failure"
-      className="products-failure"
-    />
+    <div className="failure">
+      <img
+        src="https://assets.ccbp.in/frontend/react-js/nxt-trendz/nxt-trendz-products-error-view.png"
+        alt="products failure"
+        className="products-failure"
+      />
+      <h1>Oops Something Went Wrong</h1>
+      <p>We have some trouble processing your request</p>
+      <p>Please try again.</p>
+    </div>
   )
 
+  renderAllProducts = () => {
+    const {apiStatus} = this.state
+
+    switch (apiStatus) {
+      case apiStatusConstants.success:
+        return this.renderProductsList()
+      case apiStatusConstants.failure:
+        return this.renderFailureProductList()
+      case apiStatusConstants.inProgress:
+        return this.renderLoader()
+      default:
+        return null
+    }
+  }
+
   render() {
-    const {isLoading} = this.state
+    const {searchValue, activeCategoryId, activeRatingId} = this.state
 
     return (
       <div className="all-products-section">
@@ -196,12 +243,16 @@ class AllProductsSection extends Component {
           categoryOptions={categoryOptions}
           ratingsList={ratingsList}
           searchInput={this.searchInput}
+          searchValue={searchValue}
+          activeCategoryId={activeCategoryId}
+          activeRatingId={activeRatingId}
           categoryFilter={this.categoryFilter}
           ratingFilter={this.ratingFilter}
           clearFilters={this.clearFilters}
+          onEnter={this.onEnter}
         />
 
-        {isLoading ? this.renderLoader() : this.renderProductsList()}
+        {this.renderAllProducts()}
       </div>
     )
   }

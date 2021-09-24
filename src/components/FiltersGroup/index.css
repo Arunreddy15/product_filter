@@ -54,7 +54,22 @@ ul {
   font-weight: 700;
   font-size: 16px;
 }
-
+.active-rating {
+  color: #0967d2;
+}
+.active-category {
+  color: #0967d2;
+  font-family: 'Roboto';
+  font-size: 16px;
+  margin: 10px 0;
+  text-decoration: wavy;
+}
+.rating-color {
+  color: #475569;
+}
+.category-item {
+  color: #475569;
+}
 .clear-filter {
   border: 1px solid #0967d2;
   background-color: transparent;
@@ -64,13 +79,8 @@ ul {
   color: #0967d2;
 }
 .category-item {
-  background-color: transparent;
-  border: 0px;
   font-family: 'Roboto';
   font-size: 16px;
-  margin: 5px 0;
-}
-.rate {
-  background-color: transparent;
-  border: 0px;
+  margin: 10px 0;
+  color: #475569;
 }

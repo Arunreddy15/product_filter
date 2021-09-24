@@ -23,7 +23,39 @@
   font-size: 20px;
   font-weight: 500;
 }
-
+.not-found {
+  height: 400px;
+  width: 70%;
+  margin-top: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  color: #475569;
+}
+.not-found h1 {
+  margin-bottom: 0;
+  font-size: 20px;
+  color: #0f172a;
+}
+.failure {
+  height: 400px;
+  width: 70%;
+  margin-top: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  color: #475569;
+}
+.failure h1 {
+  color: #0f172a;
+  margin-bottom: 0;
+  font-size: 20px;
+}
+.failure p {
+  margin: 10px 0 0 0;
+}
 @media screen and (min-width: 768px) {
   .products-heading {
     font-size: 32px;
