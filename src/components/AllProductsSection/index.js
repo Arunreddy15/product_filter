@@ -87,8 +87,8 @@ class AllProductsSection extends Component {
     this.setState({categoryId: value}, this.getProducts)
   }
 
-  ratingFilter = value => {
-    this.setState({ratingId: value}, this.getProducts)
+  ratingFilter = id => {
+    this.setState({ratingId: id}, this.getProducts)
   }
 
   clearFilters = () => {

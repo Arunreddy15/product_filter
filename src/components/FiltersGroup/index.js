@@ -23,13 +23,6 @@ const FiltersGroup = props => {
     categoryFilter(parseInt(value, 10))
   }
 
-  const onChangeRatingOption = event => {
-    const {target} = event
-    const {value} = target
-    ratingFilter(parseInt(value, 10))
-    console.log(event.target.value)
-  }
-
   return (
     <div className="filters-group-container">
       {/* Replace this element with your code */}
@@ -63,19 +56,22 @@ const FiltersGroup = props => {
       <div>
         <p className="title-rating">Rating</p>
         <ul>
-          {ratingsList.map(each => (
-            <li className="rating-box" key={each.ratingId}>
-              <button
-                type="button"
-                onClick={onChangeRatingOption}
-                className="rate"
-                id={each.ratingId}
-              >
-                <img src={each.imageUrl} alt="rating" className="rate-star" />
-              </button>
-              <p>&Up</p>
-            </li>
-          ))}
+          {ratingsList.map(each => {
+            const onChangeRatingOption = ratingFilter(each.ratingId)
+            return (
+              <li className="rating-box" key={each.ratingId}>
+                <button
+                  type="button"
+                  onClick={onChangeRatingOption}
+                  className="rate"
+                  id={each.ratingId}
+                >
+                  <img src={each.imageUrl} alt="rating" className="rate-star" />
+                </button>
+                <p>&Up</p>
+              </li>
+            )
+          })}
         </ul>
       </div>
       <button type="button" className="clear-filter" onClick={clearFilters}>
